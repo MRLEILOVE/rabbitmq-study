@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.leigq.shardingspherestudy.domain.mapper.OrderMapper">
+
+    <select id="listOrder" resultType="com.leigq.shardingspherestudy.domain.entity.Order">
+        SELECT `order_id`,`name`,`msg_id`,`create_time`,`update_time` FROM t_order WHERE create_time BETWEEN #{startTime} AND #{endTime} and order_id in(1587793820959567873,1587793837992636418);
+    </select>
+
+</mapper>
