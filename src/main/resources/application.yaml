@@ -176,6 +176,10 @@ spring:
               sharding-columns: order_id, create_time
               # 复合分片，注意前面没有“complex”
               algorithm-class-name: com.leigq.shardingspherestudy.config.MyTableComplexShardingAlgorithm
+      # 自动创建分片表的表模板
+      table-templates:
+        t_order: t_order_0_2022_09
+
 
 
   datasource:

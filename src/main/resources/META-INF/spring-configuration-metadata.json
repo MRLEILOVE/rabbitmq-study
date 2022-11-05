@@ -1,0 +1,18 @@
+{
+  "groups": [
+    {
+      "name": "spring.shardingsphere.sharding.table-templates",
+      "type": "com.leigq.shardingspherestudy.propreties.ShardingTableTemplateProperties",
+      "sourceType": "com.leigq.shardingspherestudy.propreties.ShardingTableTemplateProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "spring.shardingsphere.sharding.table-templates.table-templates",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "The Table templates.",
+      "sourceType": "com.leigq.shardingspherestudy.propreties.ShardingTableTemplateProperties"
+    }
+  ],
+  "hints": []
+}
