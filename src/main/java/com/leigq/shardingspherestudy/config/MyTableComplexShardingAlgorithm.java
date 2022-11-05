@@ -3,14 +3,14 @@ package com.leigq.shardingspherestudy.config;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.google.common.collect.Range;
 import com.leigq.shardingspherestudy.domain.entity.Order;
+import com.leigq.shardingspherestudy.utils.DateUtils;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingValue;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static com.leigq.shardingspherestudy.cons.ShardingCons.ORDER_TABLE_SHARD_NODE_NUM;
 
 /**
  * 表的复杂分片
@@ -41,7 +41,7 @@ public class MyTableComplexShardingAlgorithm implements ComplexKeysShardingAlgor
         for (Long id : idValues) {
             for (LocalDateTime date : createTimeValues) {
                 // id取模，时间取年、月
-                String suffix = id % 2 + "_" + date.getYear() + "_" + this.getMonth(date);
+                String suffix = id % ORDER_TABLE_SHARD_NODE_NUM + "_" + date.getYear() + "_" + DateUtils.getMonth(date);
 
                 for (String tableName : tableNames) {
                     if (tableName.endsWith(suffix)) {
@@ -114,7 +114,7 @@ public class MyTableComplexShardingAlgorithm implements ComplexKeysShardingAlgor
             for (int i = 0; i < createTimeStrings.size(); i++) {
                 // 多一层转换，因为当真正运行时，createTimeStrings会被赋值为Timestamp类型
                 final String s = String.valueOf(createTimeStrings.get(i));
-                targetCreateTimes.add(this.toLocalDateTime(s));
+                targetCreateTimes.add(DateUtils.toLocalDateTime(s));
             }
         }
 
@@ -124,8 +124,8 @@ public class MyTableComplexShardingAlgorithm implements ComplexKeysShardingAlgor
         if (columnNameAndRangeValuesMap.containsKey(key)) {
             final Range<String> createTimesRange = columnNameAndRangeValuesMap.get(key);
             // between and 的起始值 多一层转换，因为当真正运行时，createTimesRange会被赋值为Timestamp类型
-            LocalDateTime lower = this.toLocalDateTime(String.valueOf(createTimesRange.lowerEndpoint()));
-            LocalDateTime upper = this.toLocalDateTime(String.valueOf(createTimesRange.upperEndpoint()));
+            LocalDateTime lower = DateUtils.toLocalDateTime(String.valueOf(createTimesRange.lowerEndpoint()));
+            LocalDateTime upper = DateUtils.toLocalDateTime(String.valueOf(createTimesRange.upperEndpoint()));
 
             //年差
             final int years = lower.getYear() - upper.getYear();
@@ -144,41 +144,5 @@ public class MyTableComplexShardingAlgorithm implements ComplexKeysShardingAlgor
         }
 
         return targetCreateTimes;
-    }
-
-
-    private LocalDateTime toLocalDateTime(Date date) {
-        Instant instant = date.toInstant();
-        ZoneId zone = ZoneId.systemDefault();
-        // Date转换为LocalDateTime
-        return LocalDateTime.ofInstant(instant, zone);
-    }
-
-    private LocalDateTime toLocalDateTime(final String date) {
-        String newDate = date;
-
-        // 去除毫秒
-        if (date.contains(".")) {
-            newDate = date.substring(0, date.indexOf("."));
-        }
-
-        return LocalDateTime.parse(newDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
-
-    private Date toDate(LocalDateTime localDateTime) {
-        final Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-        // LocalDateTime转换为Date
-        return Date.from(instant);
-    }
-
-    private Date toDate(String date) {
-        // LocalDateTime转换为Date
-        return this.toDate(this.toLocalDateTime(date));
-    }
-
-
-
-    private String getMonth(LocalDateTime date) {
-        return date.getMonthValue() < 10 ? String.format("%02d", date.getMonthValue()) : date.getMonthValue() + "";
     }
 }
